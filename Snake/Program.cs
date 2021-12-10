@@ -11,25 +11,58 @@ int headX;
 int headY;
 int[,] GameField;
 int w = 80, h = 40;
+int score=0;
+int lifes=3;
 
 //Заставка
 void SplashScreen()
 {
-    //for (int i = 0;i<=w;i++)
-    //{
-    //    Console.SetCursorPosition(i, 0);
-    //    Console.Write('#');
-    //    Console.SetCursorPosition(i, h+1);
-    //    Console.Write('#');
-    //}
-    //for (int i = 0; i <= h; i++)
-    //{
-    //    Console.SetCursorPosition(0, i);
-    //    Console.Write('#');
-    //    Console.SetCursorPosition(w+1, i);
-    //    Console.Write('#');
-    //}
 
+    string[] ss = new string[10];
+    ss[0] = "  sss   s    s   sss s   s   ssssss";
+    ss[1] = " s   s  s    s  s  s s  s    s     ";
+    ss[2] = "  s     ss   s s   s s s     s     ";
+    ss[3] = "   s    s s  s sssss ss      ssssss";
+    ss[4] = "    s   s  s s s   s s s     s     ";
+    ss[5] = "     s  s   ss s   s s  s    s     ";
+    ss[6] = "s    s  s    s s   s s   s   s     ";
+    ss[7] = "  sss   s    s s   s s    s  ssssss";
+    ss[8] = "                                   ";
+    ss[9] = "Author: ZAA. All right reserved    ";
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    for(int i=0;i<ss.Length;i++)
+        for(int j=0;j<ss[i].Length;j++)
+        {
+            Console.SetCursorPosition(j+25,i+10 );
+            Console.Write(ss[i][j]);
+            //System.Console.Beep(200, 1);
+            //System.Threading.Thread.Sleep(5);
+        }
+    Console.SetCursorPosition(30, 25);
+    Console.Write("Press any key to start");
+    Console.ResetColor();
+
+}
+
+void Init()
+{
+    Console.CursorVisible = false;
+    Console.SetWindowSize(w + 1, h + 3);
+    Console.SetBufferSize(w + 1, h + 3);
+}
+
+void Load()
+{
+    vx = 0;
+    vy = 1;
+    headX = 20;
+    headY = 10;
+    GameField = new int[w+1, h+1];
+    GameField[headX, headY] = 1;
+    Random random = new Random();
+    for(int i=0;i<10000;i++)
+        GameField[random.Next(80), random.Next(40)] =-1 ;
     for (int i = 0; i <= w; i++)
     {
         GameField[i, 0] = 10000;
@@ -40,31 +73,6 @@ void SplashScreen()
         GameField[0, i] = 10000;
         GameField[w, i] = 10000;
     }
-
-
-
-}
-
-void Init()
-{
-    Console.CursorVisible = false;
-    Console.SetWindowSize(w+1, h+2);
-    Console.SetBufferSize(w+1, h+2);
-    vx = 0;
-    vy = 1;
-    headX = 20;
-    headY = 10;
-    GameField = new int[w+1, h+1];
-    GameField[headX, headY] = 1;
-    //GameField[headX, headY - 1] = 2;
-    //GameField[headX, headY - 2] = 3;
-    //GameField[headX, headY - 3] = 4;
-    Random random = new Random();
-    for(int i=0;i<10000;i++)
-        GameField[random.Next(80), random.Next(40)] =-1 ;
-    PrintGameField();
-    timer.Interval = 500;
-    //timer.Start();
 }
 
 void Update()
@@ -79,6 +87,7 @@ void Update()
 
         if (GameField[headX, headY] < 0)
         {
+            score++;
             GameField[headX, headY] = 1;
             Next(headX-vx, headY-vy, 1, 1);
         }
@@ -116,8 +125,8 @@ void PrintGameField()
     for (int y = 0; y <= h; y++)
         for (int x = 0; x <= w; x++)
         {
-            Console.SetCursorPosition(x, y);
-            //System.Threading.Thread.Sleep(1);
+            Console.SetCursorPosition(x, y+1);
+            
             switch (GameField[x,y])
             {
                 case 0:
@@ -135,15 +144,10 @@ void PrintGameField()
                     break;
             }
         }
+    Console.SetCursorPosition(10, 0);
+    Console.Write($"Score:{score} Lifes:{lifes}");
 }
 
-void Timer_Elapsed(object? sender, ElapsedEventArgs e)
-{
-    //if (!Console.KeyAvailable) return;
-    Update();
-    PrintGameField();
-    KeyboardUpdate();
-}
 
 void KeyboardUpdate()
 {
@@ -154,7 +158,6 @@ void KeyboardUpdate()
         System.Diagnostics.Debug.WriteLine(key);
         System.Diagnostics.Debug.WriteLine("X=" + headX + " Y=" + headY + " VX=" + vx + " VY=" + vy);
         Console.Title = DateTime.Now.ToLongTimeString();
-        //if (key == ConsoleKey.Escape) return;
         switch (key)
         {
 
@@ -191,19 +194,21 @@ void KeyboardUpdate()
 
 }
 
-
 Init();
 SplashScreen();
-//Console.ReadKey();
-//timer.Elapsed += Timer_Elapsed;
-
-
-//PrintGameField();
-
-while (!quit)
+Console.ReadKey();
+while (lifes > 0)
 {
-    KeyboardUpdate();
-    Update();
+    Load();
     PrintGameField();
-    //System.Threading.Thread.Sleep(5);
+    Console.ReadKey();
+    while (!quit)
+    {
+        KeyboardUpdate();
+        Update();
+        PrintGameField();
+        //System.Threading.Thread.Sleep(5);
+    };
+    lifes--;
+    quit = false;
 };
