@@ -42,6 +42,8 @@ void Update()
     {
         headX += vx;
         headY += vy;
+        if (Collision()) return;
+
         if (GameField[headX, headY] < 0)
         {
             GameField[headX, headY] = 1;
@@ -49,10 +51,16 @@ void Update()
         }
         else
             Next(headX, headY, 1);
-        //if (GameField[headX, headY] > 0) quit = true;
+        
     }
 }
 
+bool Collision()
+{
+    if (GameField[headX, headY] > 0) quit = true;
+    if (headX < 1 || headX > w || headY < 1 || headY > h) quit = true;
+    return quit;
+}
 void Next(int tailX,int tailY, int n,int p=0)
 {
     
@@ -80,7 +88,7 @@ void PrintGameField()
             switch (GameField[x,y])
             {
                 case 0:
-                    Console.WriteLine('█');
+                    Console.WriteLine(' ');
                     break;
                 case -1:
                     Console.WriteLine('&');
@@ -89,7 +97,8 @@ void PrintGameField()
                     Console.WriteLine('1');
                     break;
                 default:
-                    Console.WriteLine(GameField[x,y]);
+                    //Console.WriteLine(GameField[x,y]);
+                    Console.WriteLine('█');
                     break;
             }
         }
@@ -161,5 +170,5 @@ while (!quit)
     KeyboardUpdate();
     Update();
     PrintGameField();
-    System.Threading.Thread.Sleep(100);
+    System.Threading.Thread.Sleep(50);
 };
