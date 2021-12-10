@@ -13,6 +13,8 @@ int[,] GameField;
 int w = 80, h = 40;
 int score=0;
 int lifes=3;
+int apples;
+int level = 0;
 
 //Заставка
 void SplashScreen()
@@ -52,17 +54,21 @@ void Init()
     Console.SetBufferSize(w + 1, h + 3);
 }
 
-void Load()
+void Load(int level=1)
 {
     vx = 0;
     vy = 1;
-    headX = 20;
-    headY = 10;
+    headX = w/2;
+    headY = h/2;
     GameField = new int[w+1, h+1];
     GameField[headX, headY] = 1;
     Random random = new Random();
-    for(int i=0;i<10000;i++)
-        GameField[random.Next(80), random.Next(40)] =-1 ;
+    apples = level+1;
+    //разбрасываем яблоки
+    for(int i=0;i<apples;i++)
+        GameField[random.Next(1,w), random.Next(1,h)] =-1 ;
+
+    //создаем бардюры
     for (int i = 0; i <= w; i++)
     {
         GameField[i, 0] = 10000;
@@ -88,6 +94,12 @@ void Update()
         if (GameField[headX, headY] < 0)
         {
             score++;
+            apples--;
+            if (apples==0)
+            {
+                quit=true;
+                return;
+            }
             GameField[headX, headY] = 1;
             Next(headX-vx, headY-vy, 1, 1);
         }
@@ -145,7 +157,7 @@ void PrintGameField()
             }
         }
     Console.SetCursorPosition(10, 0);
-    Console.Write($"Score:{score} Lifes:{lifes}");
+    Console.Write($"Level:{level} Score:{score} Lifes:{lifes} Apples:{apples}");
 }
 
 
@@ -199,7 +211,7 @@ SplashScreen();
 Console.ReadKey();
 while (lifes > 0)
 {
-    Load();
+    Load(++level);
     PrintGameField();
     Console.ReadKey();
     while (!quit)
